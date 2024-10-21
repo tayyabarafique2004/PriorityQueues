@@ -1,13 +1,12 @@
 #include<iostream>
 #include<string>
-#include<algorithm>
+//#include<algorithm>
 #include<vector>
 using namespace std;
 #define max 100
 class Queue 
 {
 private:
-	//int priority;
 	int front;
 	int rear;
 	string* names;
@@ -23,6 +22,7 @@ public:
 	{
 		if (isFull())
 		{
+			cout << "Queue is Full" << endl;
 			return false;
 		}
 
@@ -55,6 +55,7 @@ public:
 		
 		if (isEmpty())
 		{
+			cout << "Queue was Empty"<<endl;
 			return pair<string,int>("", -1);
 		}
 		pair<string, int> dequeuedElement = make_pair(names[front], priorityQ[front]);
@@ -77,7 +78,6 @@ public:
 	{
 		if (front == -1)
 		{
-			//cout << "Queue is Empty" << endl;
 			return true;
 		}
 		else
@@ -104,7 +104,7 @@ public:
 		cout << "Current Queue:" << endl;
 		int i = front;
 
-		while (true)
+		while (i!=rear)
 		{
 			cout << "Name: " << names[i] << ", Priority: " << priorityQ[i] << endl;
 
@@ -141,32 +141,38 @@ public:
 	}
 };
 
-
 int main()
 {
 	Queue pQ;
 	vector<user> users;
-	cout << "Make your own users and prioritize them:";
+	cout << "*** Make your own Roles and prioritize them ***:";
 	string role;
 	int priority;
 	string choice;
+	bool flag = true;
 	do
 	{
 		cout << "\nEnter Role:";
 		getline(cin, role);
-		cout << "Enter priority of the role: ";
-		while (!(cin >> priority))
+		if (role == "") { cout << "invalid role" << endl; flag = false; }
+		if (flag == true)
 		{
-			cout << "Error: Enter a valid priority: " << endl;
-			cin.clear();
-			cin.ignore(123, '\n');
+			cout << "Enter priority of the role: ";
+			while (!(cin >> priority))
+			{
+				cout << "Error: Enter a valid priority: " << endl;
+				cin.clear();
+				cin.ignore(123, '\n');
+			}
+			cin.ignore();
+			users.emplace_back(role, priority);
 		}
-		cin.ignore();
-		users.emplace_back(role, priority);
-		cout << "Press 1 to continue creating roles,\nany button to exit\n";
+		
+		cout << "\nPress 1 to continue creating roles, Any button to exit\n";
 		getline(cin, choice);
 	
 	} while (choice == "1");
+
 	cout << "Available Roles: " << endl;
 	for (auto& user : users)
 	{
@@ -175,31 +181,43 @@ int main()
 	string selectedRole;
 	string name;
 	string option;
+	flag = true;
+	bool enque = false;
 	bool found = false;
 	do
 	{
-		cout << "Enter the role: ";
+		cout << "Enter the Role: ";
 		getline(cin, selectedRole);
-
-		cout << "Enter name : ";
-		getline(cin, name);
-		for (auto& user : users)
+		if (selectedRole == "") { cout << "invalid role" << endl; flag = false; }
+		else
+			flag = true;
+		if (flag == true)
 		{
-			if (user.getRole() == selectedRole)
+			cout << "Enter Name : ";
+			getline(cin, name);
+			for (auto& user : users)
 			{
-				found = true;
-				pQ.enqueue(name, user.getPriority());
-				break;
+				found = false;
+				if (user.getRole() == selectedRole)
+				{
+					found = true;
+					enque=pQ.enqueue(name, user.getPriority());
+					if (!enque) {
+						cout << "Failed! Queue is full" << endl;
+					}
+					break;
+				}
 			}
 			if (found == false)
-				cout <<"Invalid Role Entered!"<<endl;
+				cout << "Invalid Role Entered!" << endl;
 		}
-		cout << "\nPress x to exit,\nany button to continue\n";
+		
+		cout << "\nPress 'x' to exit, Any key to continue: ";
 		getline(cin, option);
 	} while (option != "x");
 
+	//Deque using pair 
 	pair<string, int> dequeuedElement = pQ.dequeue();
-
 	if (dequeuedElement.first == "" && dequeuedElement.second == -1)
 	{
 		cout << "Queue is empty!" << endl;
@@ -209,6 +227,7 @@ int main()
 		cout << "Dequeued Name: " << dequeuedElement.first << endl;
 		cout << "Dequeued Priority: " << dequeuedElement.second << endl;
 	}
+
 	pQ.displayQueue();
 
 	return 0;
